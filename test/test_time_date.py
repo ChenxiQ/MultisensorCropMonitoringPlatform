@@ -1,4 +1,5 @@
 import time
+import datetime
 
 loggerName = "Chenxi"
 fieldNumber = "5"
@@ -9,3 +10,5 @@ csvFilePrefix = "/home/pi/MultisensorCropMonitoringPlatform/data/lidar"
 csvFilePath = "{}/Field{}_{}_Row{}.csv".format(csvFilePrefix, fieldNumber, captureDate, rowNumber)
 
 print(csvFilePath)
+
+print(datetime.datetime.now().time())

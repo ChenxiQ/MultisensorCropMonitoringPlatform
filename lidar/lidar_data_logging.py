@@ -2,7 +2,9 @@
 
 import serial
 import time
+import datetime
 import csv
+import os
 
 
 debugMode = True
@@ -43,14 +45,15 @@ def dataLogging():
         csvFilePrefix = "/home/pi/MultisensorCropMonitoringPlatform/data/lidar/debug"
     else:
         csvFilePrefix = "/home/pi/MultisensorCropMonitoringPlatform/data/lidar"
-    csvFilePath = "{}/Field{}_Row{}_{}.csv".format(csvFilePrefix, fieldNumber, rowNumber, captureDate)
+    csvFilePath = "{}/Field{}_Row{}_{}_{}.csv".format(csvFilePrefix, fieldNumber, rowNumber, captureDate, loggerName)
     print("Writing data to {}".format(csvFilePath))
     time.sleep(3)
 
     # Write header info to .cvs file
     with open(csvFilePath, "a", newline="", ) as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        spamwriter.writerow(["Logger", loggerName, "Field #", fieldNumber, "Row #", rowNumber])
+        # spamwriter.writerow(["Logger", loggerName, "Field #", fieldNumber, "Row #", rowNumber, "cm"])
+        spamwriter.writerow(["Time", "Height"])
 
     ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
     ser.reset_input_buffer()
@@ -59,14 +62,16 @@ def dataLogging():
         with open(csvFilePath, "a", newline="", ) as csvfile:
             spamwriter = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
             if ser.in_waiting > 0:
-                captureTime = str(time.strftime(DATETIMESTYLE, time.localtime(time.time())))
+                # captureTime = str(time.strftime(DATETIMESTYLE, time.localtime(time.time())))
+                timeStamp = datetime.datetime.now().time()
                 distance = ser.readline().decode('utf-8').rstrip()
-                print("{} {} cm".format(captureTime, distance))
-                spamwriter.writerow([captureTime, distance, "cm"])
+                print("{} {} cm".format(timeStamp, distance))
+                spamwriter.writerow([timeStamp, distance])
 
 
 if __name__ == '__main__':
     try:
         dataLogging()
     except KeyboardInterrupt:
+        os.system("/home/pi/MultisensorCropMonitoringPlatform/reset_arduino.sh")
         quit()
