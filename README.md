@@ -1,1 +1,1 @@
-# MultisensorCropMonitoringPlatform
+# Multisensor Crop Monitoring Platform
