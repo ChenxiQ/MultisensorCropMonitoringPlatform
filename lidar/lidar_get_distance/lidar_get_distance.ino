@@ -112,8 +112,8 @@ void loop() {
         myLidarLite.takeRange();
         distance = myLidarLite.readDistance();
         // Serial.print("Sensor distance: ");
-        Serial.print(distance);
+        Serial.println(distance);
         // Serial.println(" cm.");
     }
-    delay(1000);
+    delay(100);
 }
