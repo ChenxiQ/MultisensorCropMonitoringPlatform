@@ -80,7 +80,7 @@ def dataLogging():
                 timeStamp = datetime.datetime.now().time()
                 distance = ser.readline().decode('utf-8').rstrip()
                 print("{} {} cm".format(timeStamp, distance))
-                spamwriter.writerow([timeStamp, distance, gpsData[:-2]])
+                spamwriter.writerow([timeStamp, distance] + gpsData[:-2].split(","))
                 print(gpsData[:-2])
                 print()
 
