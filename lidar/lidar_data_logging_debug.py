@@ -8,7 +8,7 @@ import os
 import threading
 
 
-debugMode = False
+debugMode = True
 loggerName = "Undefined"
 fieldNumber = "Undefined"
 rowNumber = "Undefined"
@@ -89,7 +89,8 @@ if __name__ == '__main__':
     try:
         getGPSInfoThread = threading.Thread(target=getGPSInfo, daemon=True)
         getGPSInfoThread.start()
+        time.sleep(2)
         dataLogging()
     except KeyboardInterrupt:
-        os.system("/home/pi/MultisensorCropMonitoringPlatform/reset_arduino.sh")
+        # os.system("/home/pi/MultisensorCropMonitoringPlatform/reset_arduino.sh")
         quit()
