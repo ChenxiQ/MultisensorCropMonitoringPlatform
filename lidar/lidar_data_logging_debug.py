@@ -15,7 +15,8 @@ rowNumber = "Undefined"
 
 DATETIMESTYLE = "%Y-%m-%d_%H:%M:%S"
 
-gps_serial = serial.Serial("/dev/ttyUSB0", 19200)
+gpsSerial = serial.Serial("/dev/ttyUSB0", 19200)
+gpsSerial.reset_input_buffer()
 gpsData = None
 
 
@@ -23,7 +24,7 @@ def getGPSInfo():
     global gpsData
 
     while True:
-        tmpGPSData = gps_serial.readline().decode("utf-8")
+        tmpGPSData = gpsSerial.readline().decode("utf-8")
 
         if tmpGPSData.startswith('$GPGGA,'):
             gpsData = tmpGPSData
@@ -49,7 +50,7 @@ def dataLogging():
         startRecording = True if input() == "y" else False
 
     print("================================")
-    print(" Logging crop height data in 3s ")
+    print("    Logging crop height data    ")
     print("      Press Ctrl+C to exit      ")
     print("================================")
 
@@ -61,7 +62,7 @@ def dataLogging():
         csvFilePrefix = "/home/pi/MultisensorCropMonitoringPlatform/data/lidar"
     csvFilePath = "{}/Field{}_Row{}_{}_{}_raw.csv".format(csvFilePrefix, fieldNumber, rowNumber, captureDate, loggerName)
     print("Writing data to {}".format(csvFilePath))
-    time.sleep(3)
+    time.sleep(1)
 
     # Write header info to .cvs file
     with open(csvFilePath, "a", newline="", ) as csvfile:
@@ -69,16 +70,16 @@ def dataLogging():
         # spamwriter.writerow(["Logger", loggerName, "Field #", fieldNumber, "Row #", rowNumber, "cm"])
         spamwriter.writerow(["Lidar Time", "Height (cm)", "Log Format", "GPS UTC Time", "Latitude", "Latitude Direction", "Longitude", "Longitude Direction", "GPS Quality Indicator", "# sats", "hdop", "alt", "a-units", "undulation", "u-units", "age", "stn ID & Check Sum"])
 
-    ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
-    ser.reset_input_buffer()
+    lidarSerial = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
+    lidarSerial.reset_input_buffer()
 
     while True:
         with open(csvFilePath, "a", newline="", ) as csvfile:
             spamwriter = csv.writer(csvfile, delimiter=',')
-            if ser.in_waiting > 0:
+            if lidarSerial.in_waiting > 0:
                 # captureTime = str(time.strftime(DATETIMESTYLE, time.localtime(time.time())))
                 timeStamp = datetime.datetime.now().time()
-                distance = ser.readline().decode('utf-8').rstrip()
+                distance = lidarSerial.readline().decode('utf-8').rstrip()
                 print("{} {} cm".format(timeStamp, distance))
                 spamwriter.writerow([timeStamp, distance] + gpsData[:-2].split(","))
                 print(gpsData[:-2])
@@ -89,7 +90,6 @@ if __name__ == '__main__':
     try:
         getGPSInfoThread = threading.Thread(target=getGPSInfo, daemon=True)
         getGPSInfoThread.start()
-        time.sleep(2)
         dataLogging()
     except KeyboardInterrupt:
         # os.system("/home/pi/MultisensorCropMonitoringPlatform/reset_arduino.sh")
