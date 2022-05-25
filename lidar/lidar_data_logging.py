@@ -67,7 +67,7 @@ def dataLogging():
     with open(csvFilePath, "a", newline="", ) as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=',')
         # spamwriter.writerow(["Logger", loggerName, "Field #", fieldNumber, "Row #", rowNumber, "cm"])
-        spamwriter.writerow(["Lidar Time", "Height (cm)", "Log Format", "GPS UTC Time", "Latitude", "Latitude Direction", "Longitude", "Longitude Direction", "GPS Quality Indicator", "# sats", "hdop", "alt", "a-units", "undulation", "u-units", "age", "stn ID", "Check Sum"])
+        spamwriter.writerow(["Lidar Time", "Height (cm)", "Log Format", "GPS UTC Time", "Latitude", "Latitude Direction", "Longitude", "Longitude Direction", "GPS Quality Indicator", "# sats", "hdop", "alt", "a-units", "undulation", "u-units", "age", "stn ID & Check Sum"])
 
     ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
     ser.reset_input_buffer()
