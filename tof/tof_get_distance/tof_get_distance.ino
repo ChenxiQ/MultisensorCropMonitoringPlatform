@@ -33,9 +33,8 @@ void loop(void) {
     distanceSensor.clearInterrupt();
     distanceSensor.stopRanging();
 
-    Serial.print("Distance(mm): ");
-    Serial.print(distance);
-    Serial.println();
+    // Serial.print("Distance(mm): ");
+    Serial.println(distance);
 
     delay(100);
 }
