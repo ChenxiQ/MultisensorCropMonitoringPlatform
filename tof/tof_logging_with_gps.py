@@ -12,7 +12,7 @@ debugMode = True
 loggerName = "debugLogger"
 fieldNumber = "debugField"
 rowNumber = "debugRow"
-baseDistance = "debugBaseDistance"
+baseDistance = 0
 
 DATETIMESTYLE = "%Y-%m-%d_%H:%M:%S"
 
@@ -73,7 +73,7 @@ def dataLogging():
     # Write header info to .cvs file
     with open(csvFilePath, "a", newline="", ) as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=',')
-        spamwriter.writerow(["Sensor Time", "ToF Height (cm)", "Log Format", "GPS UTC Time", "Latitude", "Latitude Direction", "Longitude", "Longitude Direction", "GPS Quality Indicator", "# sats", "hdop", "alt", "a-units", "undulation", "u-units", "age", "stn ID & Check Sum"])
+        spamwriter.writerow(["Sensor Time", "ToF Height (cm)", "Crop Height (cm)", "Log Format", "GPS UTC Time", "Latitude", "Latitude Direction", "Longitude", "Longitude Direction", "GPS Quality Indicator", "# sats", "hdop", "alt", "a-units", "undulation", "u-units", "age", "stn ID & Check Sum"])
 
     arduinoSerial = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
     arduinoSerial.reset_input_buffer()
@@ -91,8 +91,10 @@ def dataLogging():
                     continue
                 
                 if cnt > 20:
-                    print("{} {} cm".format(timeStamp, tofDistance))
-                    spamwriter.writerow([timeStamp, tofDistance] + gpsData[:-2].split(","))
+                    tofDistance = tofDistance // 10
+                    cropHeight = baseDistance - tofDistance
+                    print("{} \t tofDistance: {}cm \t cropHeight: {}cm".format(timeStamp, tofDistance, cropHeight))
+                    spamwriter.writerow([timeStamp, tofDistance, cropHeight] + gpsData[:-2].split(","))
                     print(gpsData[:-2])
                     print()
                 

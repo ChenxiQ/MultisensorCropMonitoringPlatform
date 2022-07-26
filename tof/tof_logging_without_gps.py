@@ -11,7 +11,7 @@ debugMode = True
 loggerName = "debugLogger"
 fieldNumber = "debugField"
 rowNumber = "debugRow"
-baseDistance = "debugBaseDistance"
+baseDistance = 0
 
 DATETIMESTYLE = "%Y-%m-%d_%H:%M:%S"
 
@@ -58,7 +58,7 @@ def dataLogging():
     # Write header info to .cvs file
     with open(csvFilePath, "a", newline="", ) as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=',')
-        spamwriter.writerow(["Sensor Time", "ToF Height (cm)"])
+        spamwriter.writerow(["Sensor Time", "ToF Height (cm)", "Crop height (cm)"])
 
     arduinoSerial = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
     arduinoSerial.reset_input_buffer()
@@ -76,8 +76,10 @@ def dataLogging():
                     continue
 
                 if cnt > 20:
-                    print("{} {} cm".format(timeStamp, tofDistance))
-                    spamwriter.writerow([timeStamp, tofDistance])
+                    tofDistance = tofDistance // 10
+                    cropHeight = baseDistance - tofDistance
+                    print("{} \t tofDistance: {}cm \t cropHeight: {}cm".format(timeStamp, tofDistance, cropHeight))
+                    spamwriter.writerow([timeStamp, tofDistance, cropHeight])
                 
                 cnt += 1
 
