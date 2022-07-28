@@ -8,7 +8,7 @@ import os
 import threading
 
 
-debugMode = True
+debugMode = False
 loggerName = "debugLogger"
 fieldNumber = "debugField"
 rowNumber = "debugRow"
@@ -44,7 +44,7 @@ def dataLogging():
             loggerName = input("Please enter the logger's name: ")
             fieldNumber = input("Please enter the filed number: ")
             rowNumber = input("Please enter the row number: ")
-            baseDistance = input("Please enter the base distance: ")
+            baseDistance = int(input("Please enter the base distance: "))
             print("=============VERIFY=============")
             print("Logger's name: {}".format(loggerName))
             print("Field Number: {}".format(fieldNumber))
@@ -63,9 +63,9 @@ def dataLogging():
     # Initialize .csv file
     captureDate = str(time.strftime(DATETIMESTYLE, time.localtime(time.time())))
     if debugMode:
-        csvFilePrefix = "/home/pi/MultisensorCropMonitoringPlatform/data/tof_and_lidar/debug"
+        csvFilePrefix = "/home/pi/MultisensorCropMonitoringPlatform/data/tof/debug"
     else:
-        csvFilePrefix = "/home/pi/MultisensorCropMonitoringPlatform/data/tof_and_lidar"
+        csvFilePrefix = "/home/pi/MultisensorCropMonitoringPlatform/data/tof"
     csvFilePath = "{}/Field{}_Row{}_{}_{}_{}cm_raw.csv".format(csvFilePrefix, fieldNumber, rowNumber, captureDate, loggerName, baseDistance)
     print("Writing data to {}".format(csvFilePath))
     time.sleep(1)
@@ -86,11 +86,11 @@ def dataLogging():
             if arduinoSerial.in_waiting > 0:
                 timeStamp = datetime.datetime.now().time()
                 try:
-                    tofDistance = arduinoSerial.readline().decode('utf-8').rstrip()
+                    tofDistance = int(arduinoSerial.readline().decode('utf-8').rstrip())
                 except ValueError:
                     continue
                 
-                if cnt > 20:
+                if cnt > 5:
                     tofDistance = tofDistance // 10
                     cropHeight = baseDistance - tofDistance
                     print("{} \t tofDistance: {}cm \t cropHeight: {}cm".format(timeStamp, tofDistance, cropHeight))

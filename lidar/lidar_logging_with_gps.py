@@ -63,9 +63,9 @@ def dataLogging():
     # Initialize .csv file
     captureDate = str(time.strftime(DATETIMESTYLE, time.localtime(time.time())))
     if debugMode:
-        csvFilePrefix = "/home/pi/MultisensorCropMonitoringPlatform/data/tof_and_lidar/debug"
+        csvFilePrefix = "/home/pi/MultisensorCropMonitoringPlatform/data/lidar/debug"
     else:
-        csvFilePrefix = "/home/pi/MultisensorCropMonitoringPlatform/data/tof_and_lidar"
+        csvFilePrefix = "/home/pi/MultisensorCropMonitoringPlatform/data/lidar"
     csvFilePath = "{}/Field{}_Row{}_{}_{}_{}cm_raw.csv".format(csvFilePrefix, fieldNumber, rowNumber, captureDate, loggerName, baseDistance)
     print("Writing data to {}".format(csvFilePath))
     time.sleep(1)
@@ -73,26 +73,27 @@ def dataLogging():
     # Write header info to .cvs file
     with open(csvFilePath, "a", newline="", ) as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=',')
-        spamwriter.writerow(["Sensor Time", "Lidar Height (cm)", "ToF Height (cm)", "Log Format", "GPS UTC Time", "Latitude", "Latitude Direction", "Longitude", "Longitude Direction", "GPS Quality Indicator", "# sats", "hdop", "alt", "a-units", "undulation", "u-units", "age", "stn ID & Check Sum"])
+        spamwriter.writerow(["Sensor Time", "ToF Height (cm)", "Crop Height (cm)", "Log Format", "GPS UTC Time", "Latitude", "Latitude Direction", "Longitude", "Longitude Direction", "GPS Quality Indicator", "# sats", "hdop", "alt", "a-units", "undulation", "u-units", "age", "stn ID & Check Sum"])
 
-    arduinoSerial = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
-    arduinoSerial.reset_input_buffer()
+    lidarSerial = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
+    lidarSerial.reset_input_buffer()
 
     cnt = 0
 
     while True:
         with open(csvFilePath, "a", newline="", ) as csvfile:
             spamwriter = csv.writer(csvfile, delimiter=',')
-            if arduinoSerial.in_waiting > 0:
+            if lidarSerial.in_waiting > 0:
                 timeStamp = datetime.datetime.now().time()
                 try:
-                    lidarDistance, tofDistance = arduinoSerial.readline().decode('utf-8').rstrip().split(" ")
+                    lidarDistance = int(lidarSerial.readline().decode('utf-8').rstrip())
                 except ValueError:
                     continue
-                
+
                 if cnt > 5:
-                    print("{} {} {} cm".format(timeStamp, lidarDistance, tofDistance))
-                    spamwriter.writerow([timeStamp, lidarDistance, tofDistance] + gpsData[:-2].split(","))
+                    cropHeight = baseDistance - lidarDistance
+                    print("{} \t lidarDistance: {}cm \t cropHeight: {}cm".format(timeStamp, lidarDistance, cropHeight))
+                    spamwriter.writerow([timeStamp, lidarDistance, cropHeight] + gpsData[:-2].split(","))
                     print(gpsData[:-2])
                     print()
                 

@@ -7,7 +7,7 @@ import csv
 import os
 
 
-debugMode = True
+debugMode = False
 loggerName = "debugLogger"
 fieldNumber = "debugField"
 rowNumber = "debugRow"
@@ -29,7 +29,7 @@ def dataLogging():
             loggerName = input("Please enter the logger's name: ")
             fieldNumber = input("Please enter the filed number: ")
             rowNumber = input("Please enter the row number: ")
-            baseDistance = input("Please enter the base distance: ")
+            baseDistance = int(input("Please enter the base distance: "))
             print("=============VERIFY=============")
             print("Logger's name: {}".format(loggerName))
             print("Field Number: {}".format(fieldNumber))
@@ -58,7 +58,7 @@ def dataLogging():
     # Write header info to .cvs file
     with open(csvFilePath, "a", newline="", ) as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=',')
-        spamwriter.writerow(["Sensor Time", "ToF Height (cm)", "Crop height (cm)"])
+        spamwriter.writerow(["Sensor Time", "ToF Height (cm)", "Crop Height (cm)"])
 
     arduinoSerial = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
     arduinoSerial.reset_input_buffer()
@@ -71,11 +71,11 @@ def dataLogging():
             if arduinoSerial.in_waiting > 0:
                 timeStamp = datetime.datetime.now().time()
                 try:
-                    tofDistance = arduinoSerial.readline().decode('utf-8').rstrip()
+                    tofDistance = int(arduinoSerial.readline().decode('utf-8').rstrip())
                 except ValueError:
                     continue
 
-                if cnt > 20:
+                if cnt > 5:
                     tofDistance = tofDistance // 10
                     cropHeight = baseDistance - tofDistance
                     print("{} \t tofDistance: {}cm \t cropHeight: {}cm".format(timeStamp, tofDistance, cropHeight))
