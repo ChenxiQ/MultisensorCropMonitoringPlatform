@@ -6,9 +6,7 @@ import csv
 import os
 
 
-loggerName = "Undefined"
-fieldNumber = "Undefined"
-rowNumber = "Undefined"
+sampleName = "Undefined"
 
 DATETIMESTYLE = "%Y-%m-%d_%H:%M:%S"
 CVSHEADER = ["410", "435", "460", "485", "510", "535", "560", "585", "610", "645", "680", "705", "730", "760", "810", "860", "900", "940"]
@@ -21,11 +19,9 @@ def dataLogging():
         print("================================")
         print("====  Welcome to CornBuggy  ====")
         print("================================")
-        loggerName = input("Please enter the logger's name: ")
-        pixelNumber = input("Please enter the pixel number: ")
+        sampleName = input("Please enter the sample name: ")
         print("=============VERIFY=============")
-        print("Logger's name: {}".format(loggerName))
-        print("Field Number: {}".format(pixelNumber))
+        print("Sample Name: {}".format(sampleName))
         print("Press \"y\" to continue.")
         print("Press \"n\" to restart.")
         print("================================")
@@ -39,7 +35,7 @@ def dataLogging():
     # Initialize .csv file
     captureDate = str(time.strftime(DATETIMESTYLE, time.localtime(time.time())))
     csvFilePrefix = "/home/pi/MultisensorCropMonitoringPlatform/data/spectro"
-    csvFilePath = "{}/Pixel{}_{}_{}_raw.csv".format(csvFilePrefix, pixelNumber, captureDate, loggerName)
+    csvFilePath = "{}/{}_{}.csv".format(csvFilePrefix, sampleName, captureDate)
     print("Writing data to {}".format(csvFilePath))
     time.sleep(1)
 

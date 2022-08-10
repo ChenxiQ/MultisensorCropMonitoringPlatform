@@ -9,9 +9,7 @@ import threading
 
 
 debugMode = False
-loggerName = "debugLogger"
-fieldNumber = "debugField"
-rowNumber = "debugRow"
+sampleName = "Undefined"
 baseDistance = 0
 
 DATETIMESTYLE = "%Y-%m-%d_%H:%M:%S"
@@ -32,7 +30,7 @@ def getGPSInfo():
 
 
 def dataLogging():
-    global loggerName, fieldNumber, rowNumber, baseDistance
+    global baseDistance
 
     if not debugMode:
         # Ask user enter and confirm logging information
@@ -41,14 +39,10 @@ def dataLogging():
             print("================================")
             print("====  Welcome to CornBuggy  ====")
             print("================================")
-            loggerName = input("Please enter the logger's name: ")
-            fieldNumber = input("Please enter the filed number: ")
-            rowNumber = input("Please enter the row number: ")
+            sampleName = input("Please enter the sample name: ")
             baseDistance = int(input("Please enter the base distance: "))
             print("=============VERIFY=============")
-            print("Logger's name: {}".format(loggerName))
-            print("Field Number: {}".format(fieldNumber))
-            print("Row Number: {}".format(rowNumber))
+            print("Sample Name: {}".format(sampleName))
             print("Base Distance: {}".format(baseDistance))
             print("Press \"y\" to continue.")
             print("Press \"n\" to restart.")
@@ -66,7 +60,7 @@ def dataLogging():
         csvFilePrefix = "/home/pi/MultisensorCropMonitoringPlatform/data/tof_and_lidar/debug"
     else:
         csvFilePrefix = "/home/pi/MultisensorCropMonitoringPlatform/data/tof_and_lidar"
-    csvFilePath = "{}/Field{}_Row{}_{}_{}_{}cm_raw.csv".format(csvFilePrefix, fieldNumber, rowNumber, captureDate, loggerName, baseDistance)
+    csvFilePath = "{}/{}_{}_{}cm_raw.csv".format(csvFilePrefix, sampleName, captureDate, baseDistance)
     print("Writing data to {}".format(csvFilePath))
     time.sleep(1)
 
@@ -89,15 +83,23 @@ def dataLogging():
                     lidarDistance, tofDistance = arduinoSerial.readline().decode('utf-8').rstrip().split(" ")
                 except ValueError:
                     continue
-                
-                if cnt > 5:
+
+                if cnt < 5:
+                    pass
+                elif 5 <= cnt < 15:
                     print("{} {} {} cm".format(timeStamp, lidarDistance, tofDistance))
                     spamwriter.writerow([timeStamp, lidarDistance, tofDistance] + gpsData[:-2].split(","))
                     print(gpsData[:-2])
-                    print()
+                    print()               
+                else:
+                    quitProgram()
                 
                 cnt += 1
 
+
+def quitProgram():
+    os.system("/home/pi/MultisensorCropMonitoringPlatform/reset_arduino.sh")
+    quit()
 
 if __name__ == '__main__':
     try:

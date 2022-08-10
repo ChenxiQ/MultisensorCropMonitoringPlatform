@@ -8,29 +8,25 @@ import os
 
 
 debugMode = True
-loggerName = "Undefined"
-fieldNumber = "Undefined"
-rowNumber = "Undefined"
-baseDistance = "Undefined"
+sampleName = "Undefined"
+baseDistance = 0
 
 DATETIMESTYLE = "%Y-%m-%d_%H:%M:%S"
 
 
 def dataLogging():
+    global baseDistance
+
     # Ask user enter and confirm logging information
     startRecording = False
     while startRecording == False:
         print("================================")
         print("====  Welcome to CornBuggy  ====")
         print("================================")
-        loggerName = input("Please enter the logger's name: ")
-        fieldNumber = input("Please enter the filed number: ")
-        rowNumber = input("Please enter the row number: ")
-        baseDistance = input("Please enter the base distance: ")
+        sampleName = input("Please enter the sample name: ")
+        baseDistance = int(input("Please enter the base distance: "))
         print("=============VERIFY=============")
-        print("Logger's name: {}".format(loggerName))
-        print("Field Number: {}".format(fieldNumber))
-        print("Row Number: {}".format(rowNumber))
+        print("Sample Name: {}".format(sampleName))
         print("Base Distance: {}".format(baseDistance))
         print("Press \"y\" to continue.")
         print("Press \"n\" to restart.")
@@ -48,7 +44,7 @@ def dataLogging():
         csvFilePrefix = "/home/pi/MultisensorCropMonitoringPlatform/data/tof_and_lidar/debug"
     else:
         csvFilePrefix = "/home/pi/MultisensorCropMonitoringPlatform/data/tof_and_lidar"
-    csvFilePath = "{}/Field{}_Row{}_{}_{}_{}cm_raw.csv".format(csvFilePrefix, fieldNumber, rowNumber, captureDate, loggerName, baseDistance)
+    csvFilePath = "{}/{}_{}_{}cm_raw.csv".format(csvFilePrefix, sampleName, captureDate, baseDistance)
     print("Writing data to {}".format(csvFilePath))
     time.sleep(1)
 

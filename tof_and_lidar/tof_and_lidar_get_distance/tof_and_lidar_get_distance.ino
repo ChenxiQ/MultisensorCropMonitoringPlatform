@@ -56,5 +56,5 @@ void loop() {
     // Serial.print("ToF distance: ");
     Serial.println(distance/10);
 
-    delay(100);
+    delay(1000);
 }
